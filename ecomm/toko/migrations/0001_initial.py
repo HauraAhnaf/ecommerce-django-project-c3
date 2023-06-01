@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('harga_diskon', models.FloatField(blank=True, null=True)),
                 ('slug', models.SlugField(unique=True)),
                 ('deskripsi', models.TextField()),
-                ('gambar', models.ImageField(upload_to='product_pics')),
+                ('gambar', models.ImageField(upload_to='gambar')),
                 ('label', models.CharField(choices=[('NEW', 'primary'), ('SALE', 'secondary'), ('BEST', 'danger')], max_length=4)),
                 ('kategori', models.CharField(choices=[('S', 'Shirt'), ('SW', 'Sport wear'), ('OW', 'Outwear')], max_length=2)),
             ],
