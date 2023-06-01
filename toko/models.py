@@ -119,6 +119,7 @@ class AlamatPengiriman(models.Model):
     alamat_2 = models.CharField(max_length=100)
     negara = models.CharField(max_length=100)
     kode_pos = models.CharField(max_length=20)
+    telepon = models.CharField(max_length=20)
 
     def __str__(self):
         return f"{self.user.username} - {self.alamat_1}"
