@@ -165,23 +165,52 @@ def add_to_cart(request, slug):
             if order.produk_items.filter(produk_item__slug=produk_item.slug).exists():
                 order_produk_item.quantity += 1
                 order_produk_item.save()
-                pesan = f"ProdukItem sudah diupdate menjadi: { order_produk_item.quantity }"
+                pesan = f"Produk item sudah diupdate menjadi: {order_produk_item.quantity}"
                 messages.info(request, pesan)
-                return redirect('toko:produk-detail', slug=slug)
+                return redirect('toko:order-summary')
             else:
                 order.produk_items.add(order_produk_item)
-                messages.info(
-                    request, 'ProdukItem pilihanmu sudah ditambahkan')
+                messages.info(request, 'Produk item pilihanmu sudah ditambahkan')
                 return redirect('toko:produk-detail', slug=slug)
         else:
             tanggal_order = timezone.now()
-            order = Order.objects.create(
-                user=request.user, tanggal_order=tanggal_order)
+            order = Order.objects.create(user=request.user, tanggal_order=tanggal_order)
             order.produk_items.add(order_produk_item)
             messages.info(request, 'ProdukItem pilihanmu sudah ditambahkan')
             return redirect('toko:produk-detail', slug=slug)
     else:
         return redirect('/accounts/login')
+
+
+def remove_single_item_from_cart(request, slug):
+    if request.user.is_authenticated:
+        produk_item = get_object_or_404(ProdukItem, slug=slug)
+        order_query = Order.objects.filter(
+            user=request.user,
+            ordered=False
+        )
+        if order_query.exists():
+            order = order_query[0]
+            # check if the order item is in the order
+            if order.produk_items.filter(produk_item__slug=produk_item.slug).exists():
+                order_produk_item = OrderProdukItem.objects.filter(
+                    produk_item=produk_item,
+                    user=request.user,
+                    ordered=False
+                )[0]
+                if order_produk_item.quantity > 1:
+                    order_produk_item.quantity -= 1
+                    order_produk_item.save()
+                else:
+                    order.produk_items.remove(order_produk_item)
+                messages.info(request, "Jumlah item pilihanmu sudah diperbarui")
+                return redirect('toko:order-summary')
+            else:
+                messages.info(request, "Ups, item tidak ada di daftar belanja")
+                return redirect('toko:produk-detail', slug=slug)
+        else:
+            messages.info(request, "Kamu tidak punya order")
+            return redirect('toko:produk-detail', slug=slug)
 
 
 def remove_from_cart(request, slug):
@@ -201,18 +230,21 @@ def remove_from_cart(request, slug):
                     )[0]
 
                     order.produk_items.remove(order_produk_item)
-                    order_produk_item.delete()
+                    if order_produk_item.quantity > 1:
+                        order_produk_item.quantity -= 1
+                        order_produk_item.save()
+                        order_produk_item.delete()
 
-                    pesan = f"ProdukItem sudah dihapus"
+                    pesan = f"Produk item sudah dihapus"
                     messages.info(request, pesan)
                     return redirect('toko:produk-detail', slug=slug)
                 except ObjectDoesNotExist:
-                    print('Error: order ProdukItem sudah tidak ada')
+                    print('Error: order Produk item sudah tidak ada')
             else:
-                messages.info(request, 'ProdukItem tidak ada')
+                messages.info(request, 'Produk item tidak ada')
                 return redirect('toko:produk-detail', slug=slug)
         else:
-            messages.info(request, 'ProdukItem tidak ada order yang aktif')
+            messages.info(request, 'Produk item tidak ada order yang aktif')
             return redirect('toko:produk-detail', slug=slug)
     else:
         return redirect('/accounts/login')

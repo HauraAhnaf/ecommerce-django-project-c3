@@ -51,8 +51,16 @@ class ProdukItem(models.Model):
             "slug": self.slug
         })
 
+    def get_add_quantity_url(self):
+        return reverse("toko:add-quantity", kwargs={"slug": self.slug})
+
     def get_remove_from_cart_url(self):
         return reverse("toko:remove-from-cart", kwargs={
+            "slug": self.slug
+        })
+
+    def get_remove_single_item_from_cart_url(self):
+        return reverse("toko:remove-single-item-from-cart", kwargs={
             "slug": self.slug
         })
 
