@@ -9,7 +9,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from paypal.standard.forms import PayPalPaymentsForm
-from .forms import CheckoutForm
+from .forms import CheckoutForm, ContactForm
 from .models import ProdukItem, OrderProdukItem, Order, AlamatPengiriman, Payment
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
